@@ -10,6 +10,7 @@ type game interface {
 }
 
 type NeatCouple [2]int
+type SearchableCouple = map[NeatCouple]struct{}
 
 type mineGame interface {
 	game
@@ -23,9 +24,10 @@ type MineSweeper struct {
 	Score      int
 	BombsCount int
 	Bombs      []NeatCouple
+	Start      NeatCouple
 }
 
-func (zero *NeatCouple) AllNeighbors(max NeatCouple) map[NeatCouple]struct{} {
+func (zero *NeatCouple) AllNeighbors(max NeatCouple) SearchableCouple {
 	var res = make(map[NeatCouple]struct{}, 8)
 	for j := -1; j <= 1; j++ {
 		for i := -1; i <= 1; i++ {
@@ -52,7 +54,7 @@ func (m *MineSweeper) NumberOfPoint(pos NeatCouple) int {
 	return res
 }
 
-func randomiseBombs(bombsCount int, size NeatCouple) []NeatCouple {
+func randomiseBombs(bombsCount int, size NeatCouple, start NeatCouple) []NeatCouple {
 	bombs := make(map[NeatCouple]struct{}, bombsCount)
 	res := make([]NeatCouple, bombsCount)
 	for i := 0; i < bombsCount; i++ {
@@ -69,7 +71,7 @@ func randomiseBombs(bombsCount int, size NeatCouple) []NeatCouple {
 				randomJ = size[1] - 1
 			}
 		} else {
-			for _, ok := bombs[[2]int{randomI, randomJ}]; ok; _, ok = bombs[[2]int{randomI, randomJ}] {
+			for _, ok := bombs[[2]int{randomI, randomJ}]; ok || [2]int{randomI, randomJ} == start; _, ok = bombs[[2]int{randomI, randomJ}] {
 				randomI, randomJ = rand.IntN(size[0]), rand.IntN(size[1])
 			}
 		}
@@ -79,11 +81,12 @@ func randomiseBombs(bombsCount int, size NeatCouple) []NeatCouple {
 	return res
 }
 
-func Init(size NeatCouple, bombsCount int) MineSweeper {
+func Init(size NeatCouple, bombsCount int, start NeatCouple) MineSweeper {
 	m := MineSweeper{}
 	m.BombsCount = bombsCount
 	m.Size = size
-	m.Bombs = randomiseBombs(m.BombsCount, m.Size)
+	m.Start = start
+	m.Bombs = randomiseBombs(m.BombsCount, m.Size, m.Start)
 
 	return m
 }

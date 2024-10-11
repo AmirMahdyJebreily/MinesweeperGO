@@ -1,8 +1,9 @@
 package Tests
 
 import (
-	"hello/codeagha_minesweper/GameCore"
 	"testing"
+
+	"github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
 )
 
 func TestPointNumber(t *testing.T) {

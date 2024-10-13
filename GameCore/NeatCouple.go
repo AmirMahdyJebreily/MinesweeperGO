@@ -3,8 +3,8 @@ package GameCore
 type TCpl [2]int
 type SearchableCouple = map[TCpl]struct{}
 
-func Cpl(x, y int) TCpl {
-	return [2]int{x, y}
+func Cpl(i, j int) TCpl {
+	return [2]int{i, j}
 }
 
 func (zero *TCpl) AllNeighbors(max TCpl) SearchableCouple {

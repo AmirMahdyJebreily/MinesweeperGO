@@ -40,7 +40,7 @@ func Sprintgridf(m *GameCore.MineSweeper) string {
 }
 
 func main() {
-	g := GameCore.Init(GameCore.Cpl(8, 10), GameCore.Cpl(5, 6), 11)
+	g := GameCore.InitRand(GameCore.Cpl(8, 10), GameCore.Cpl(5, 6), 11)
 
 	fmt.Printf("%v", Sprintgridf(g))
 	fmt.Printf("\n%#v", g.Bombs)

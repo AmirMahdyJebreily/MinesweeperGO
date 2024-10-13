@@ -64,12 +64,21 @@ func randomiseBombs(bombsCount int, size TCpl, start TCpl) []TCpl {
 	return res
 }
 
-func Init(size, start TCpl, bombsCount int) *MineSweeper {
+func InitRand(size, start TCpl, bombsCount int) *MineSweeper {
 	return &MineSweeper{
 		BombsCount: bombsCount,
 		Size:       size,
 		Start:      start,
 		Bombs:      randomiseBombs(bombsCount, size, start),
+	}
+}
+
+func Init(size, start TCpl, bombsCount int, bombs []TCpl) *MineSweeper {
+	return &MineSweeper{
+		BombsCount: bombsCount,
+		Size:       size,
+		Start:      start,
+		Bombs:      bombs,
 	}
 }
 

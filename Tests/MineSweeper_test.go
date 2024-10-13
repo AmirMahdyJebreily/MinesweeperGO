@@ -3,11 +3,10 @@ package Tests
 import (
 	"testing"
 
-	"github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
 	core "github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
 )
 
-var board = core.Init(core.Cpl(8, 10), core.Cpl(5, 6), 11, []GameCore.TCpl{
+var board = core.Init(core.Cpl(8, 10), core.Cpl(5, 6), 11, []core.TCpl{
 	{0, 9}, {2, 0},
 	{7, 7}, {2, 9},
 	{2, 4}, {3, 8},

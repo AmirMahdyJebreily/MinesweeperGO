@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
+	core "github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
 )
 
 const untaped = "∙"
 const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
 
-func Sprintgridf(m *GameCore.MineSweeper) string {
+func Sprintgridf(m *core.MineSweeper) string {
 	res := ""
 	for i := 0; i < m.Size[0]; i++ {
 		if i == 0 {
@@ -40,7 +40,7 @@ func Sprintgridf(m *GameCore.MineSweeper) string {
 }
 
 func main() {
-	g := GameCore.InitRand(GameCore.Cpl(8, 10), GameCore.Cpl(5, 6), 11)
+	g := core.InitRand(core.Cpl(8, 10), core.Cpl(5, 6), 11)
 
 	fmt.Printf("%v", Sprintgridf(g))
 	fmt.Printf("\n%#v", g.Bombs)

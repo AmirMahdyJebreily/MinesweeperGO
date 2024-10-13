@@ -3,17 +3,17 @@ package Tests
 import (
 	"testing"
 
-	"github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
+	core "github.com/AmirMahdyJebreily/MinesweeperGO/GameCore"
 )
 
 func TestAllNeighbors(t *testing.T) {
 
 	cases := []struct {
-		in   GameCore.TCpl
-		want map[GameCore.TCpl]struct{}
+		in   core.TCpl
+		want map[core.TCpl]struct{}
 	}{
 
-		{[2]int{0, 4}, map[GameCore.TCpl]struct{}{}},
+		{[2]int{0, 4}, map[core.TCpl]struct{}{}},
 	}
 
 	cases[0].want[[2]int{0, 3}] = struct{}{}

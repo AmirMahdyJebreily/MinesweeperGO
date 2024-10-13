@@ -9,11 +9,11 @@ import (
 func TestAllNeighbors(t *testing.T) {
 
 	cases := []struct {
-		in   GameCore.NeatCouple
-		want map[GameCore.NeatCouple]struct{}
+		in   GameCore.TCpl
+		want map[GameCore.TCpl]struct{}
 	}{
 
-		{[2]int{0, 4}, map[GameCore.NeatCouple]struct{}{}},
+		{[2]int{0, 4}, map[GameCore.TCpl]struct{}{}},
 	}
 
 	cases[0].want[[2]int{0, 3}] = struct{}{}

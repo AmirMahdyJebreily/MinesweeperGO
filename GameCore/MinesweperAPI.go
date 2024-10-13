@@ -9,39 +9,22 @@ type game interface {
 	Play(any) bool // At every moment of the game, ply() is called, and if it returns True, the game continues, otherwise, the player loses.
 }
 
-type NeatCouple [2]int
-type SearchableCouple = map[NeatCouple]struct{}
-
 type mineGame interface {
 	game
-	SetFlag(pos NeatCouple) bool
-	Unlock(pos NeatCouple) struct{}
+	SetFlag(pos TCpl) bool
+	Unlock(pos TCpl) struct{}
 }
 
 type MineSweeper struct {
 	mineGame
-	Size       NeatCouple
+	Size       TCpl
 	Score      int
 	BombsCount int
-	Bombs      []NeatCouple
-	Start      NeatCouple
+	Bombs      []TCpl
+	Start      TCpl
 }
 
-func (zero *NeatCouple) AllNeighbors(max NeatCouple) SearchableCouple {
-	var res = make(map[NeatCouple]struct{}, 8)
-	for j := -1; j <= 1; j++ {
-		for i := -1; i <= 1; i++ {
-			nearI := zero[0] + i
-			nearJ := zero[1] + j
-			if nearJ >= 0 && nearJ < max[1] && nearI >= 0 && nearI < max[0] {
-				res[[2]int{nearI, nearJ}] = struct{}{}
-			}
-		}
-	}
-	return res
-}
-
-func (m *MineSweeper) NumberOfPoint(pos NeatCouple) int {
+func (m *MineSweeper) NumberOfPoint(pos TCpl) int {
 	res := 0
 	neighbors := pos.AllNeighbors(m.Size)
 	for i := range neighbors {
@@ -54,9 +37,9 @@ func (m *MineSweeper) NumberOfPoint(pos NeatCouple) int {
 	return res
 }
 
-func randomiseBombs(bombsCount int, size NeatCouple, start NeatCouple) []NeatCouple {
-	bombs := make(map[NeatCouple]struct{}, bombsCount)
-	res := make([]NeatCouple, bombsCount)
+func randomiseBombs(bombsCount int, size TCpl, start TCpl) []TCpl {
+	bombs := make(map[TCpl]struct{}, bombsCount)
+	res := make([]TCpl, bombsCount)
 	for i := 0; i < bombsCount; i++ {
 		randomI, randomJ := rand.IntN(size[0]), rand.IntN(size[1])
 		if i < 4 {
@@ -71,24 +54,23 @@ func randomiseBombs(bombsCount int, size NeatCouple, start NeatCouple) []NeatCou
 				randomJ = size[1] - 1
 			}
 		} else {
-			for _, ok := bombs[[2]int{randomI, randomJ}]; ok || [2]int{randomI, randomJ} == start; _, ok = bombs[[2]int{randomI, randomJ}] {
+			for _, ok := bombs[Cpl(randomI, randomJ)]; ok || Cpl(randomI, randomJ) == start; _, ok = bombs[Cpl(randomI, randomJ)] {
 				randomI, randomJ = rand.IntN(size[0]), rand.IntN(size[1])
 			}
 		}
-		bombs[[2]int{randomI, randomJ}] = struct{}{}
-		res[i] = [2]int{randomI, randomJ}
+		bombs[Cpl(randomI, randomJ)] = struct{}{}
+		res[i] = Cpl(randomI, randomJ)
 	}
 	return res
 }
 
-func Init(size NeatCouple, bombsCount int, start NeatCouple) MineSweeper {
-	m := MineSweeper{}
-	m.BombsCount = bombsCount
-	m.Size = size
-	m.Start = start
-	m.Bombs = randomiseBombs(m.BombsCount, m.Size, m.Start)
-
-	return m
+func Init(size, start TCpl, bombsCount int) *MineSweeper {
+	return &MineSweeper{
+		BombsCount: bombsCount,
+		Size:       size,
+		Start:      start,
+		Bombs:      randomiseBombs(bombsCount, size, start),
+	}
 }
 
 func (m *MineSweeper) Play(arg bool) bool {

@@ -9,7 +9,7 @@ import (
 const untaped = "∙"
 const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
 
-func Sprintgridf(m GameCore.MineSweeper) string {
+func Sprintgridf(m *GameCore.MineSweeper) string {
 	res := ""
 	for i := 0; i < m.Size[0]; i++ {
 		if i == 0 {
@@ -40,8 +40,8 @@ func Sprintgridf(m GameCore.MineSweeper) string {
 }
 
 func main() {
-	g := GameCore.Init([2]int{8, 8}, 11, [2]int{7, 7})
+	g := GameCore.Init(GameCore.Cpl(8, 10), GameCore.Cpl(5, 6), 11)
 
 	fmt.Printf("%v", Sprintgridf(g))
-	fmt.Printf("\n%v", g.Bombs)
+	fmt.Printf("\n%#v", g.Bombs)
 }

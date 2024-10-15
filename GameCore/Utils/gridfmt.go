@@ -26,7 +26,7 @@ func Sprintgridf(m *core.MineSweeper) string {
 		for j := 0; j < m.Size[1]; j++ {
 
 			thisPos := [2]int{i, j}
-			for _, bom := range m.Bombs {
+			for bom := range m.Bombs {
 				if thisPos == bom {
 					res.WriteString(fmt.Sprintf("%v   ", bomb))
 					continue lines

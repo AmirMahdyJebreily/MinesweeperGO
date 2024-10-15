@@ -20,7 +20,7 @@ type MineSweeper struct {
 	Size       TCpl
 	Score      int
 	BombsCount int
-	Bombs      []TCpl
+	Bombs      map[TCpl]struct{}
 	Start      TCpl
 }
 
@@ -28,18 +28,15 @@ func (m *MineSweeper) NumberOfPoint(pos TCpl) int {
 	res := 0
 	neighbors := pos.AllNeighbors(m.Size)
 	for i := range neighbors {
-		for _, j := range m.Bombs {
-			if i == j {
-				res++
-			}
+		if _, ok := m.Bombs[i]; ok {
+			res++
 		}
 	}
 	return res
 }
 
-func randomiseBombs(bombsCount int, size TCpl, start TCpl) []TCpl {
+func randomiseBombs(bombsCount int, size TCpl, start TCpl) map[TCpl]struct{} {
 	bombs := make(map[TCpl]struct{}, bombsCount)
-	res := make([]TCpl, bombsCount)
 	for i := 0; i < bombsCount; i++ {
 		randomI, randomJ := rand.IntN(size[0]), rand.IntN(size[1])
 		if i < 4 {
@@ -59,12 +56,13 @@ func randomiseBombs(bombsCount int, size TCpl, start TCpl) []TCpl {
 			}
 		}
 		bombs[Cpl(randomI, randomJ)] = struct{}{}
-		res[i] = Cpl(randomI, randomJ)
+
 	}
-	return res
+	return bombs
 }
 
 func InitRand(size, start TCpl, bombsCount int) *MineSweeper {
+
 	return &MineSweeper{
 		BombsCount: bombsCount,
 		Size:       size,
@@ -73,12 +71,20 @@ func InitRand(size, start TCpl, bombsCount int) *MineSweeper {
 	}
 }
 
+func AsBmbMap(bombs []TCpl) map[TCpl]struct{} {
+	bombsMap := make(map[TCpl]struct{}, 0)
+	for _, v := range bombs {
+		bombsMap[v] = struct{}{}
+	}
+	return bombsMap
+}
+
 func Init(size, start TCpl, bombsCount int, bombs []TCpl) *MineSweeper {
 	return &MineSweeper{
 		BombsCount: bombsCount,
 		Size:       size,
 		Start:      start,
-		Bombs:      bombs,
+		Bombs:      AsBmbMap(bombs),
 	}
 }
 

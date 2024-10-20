@@ -20,7 +20,7 @@ type MineSweeper struct {
 	Size       TCpl
 	Score      int
 	BombsCount int
-	Bombs      map[TCpl]struct{}
+	Bombs      SearchableCouple
 	Start      TCpl
 }
 
@@ -35,7 +35,27 @@ func (m *MineSweeper) NumberOfPoint(pos TCpl) int {
 	return res
 }
 
-func randomiseBombs(bombsCount int, size TCpl, start TCpl) map[TCpl]struct{} {
+func (m *MineSweeper) NumberpointChain(pos TCpl, res map[TCpl]int, firstNumber int) map[TCpl]int {
+	neighbors := pos.AllNeighbors(m.Size)
+	if firstNumber == 0 {
+		for i := range neighbors {
+			thisNum := m.NumberOfPoint(i)
+			if _, ok := m.Bombs[i]; !ok {
+				if _, isExists := res[i]; isExists {
+					res[i] = thisNum
+				}
+				if thisNum == 0 {
+					m.NumberpointChain(i, res, firstNumber)
+				}
+			}
+		}
+	}
+
+	res[pos] = firstNumber
+	return res
+}
+
+func randomiseBombs(bombsCount int, size TCpl, start TCpl) SearchableCouple {
 	bombs := make(map[TCpl]struct{}, bombsCount)
 	for i := 0; i < bombsCount; i++ {
 		randomI, randomJ := rand.IntN(size[0]), rand.IntN(size[1])

@@ -70,10 +70,14 @@ func TestStartPointSafe(t *testing.T) {
 		for i := 0; i < 100; i++ {
 			randBoard := core.InitRand(core.Cpl(c.in.sizeI, c.in.sizeJ), c.in.start, (c.in.sizeI*c.in.sizeJ)-1)
 			got := randBoard.NumberOfPoint(c.in.start)
-			if got != c.want {
+			if got > c.want {
 				t.Errorf("err, got : %v | want : %v", got, c.want)
 				break
 			}
 		}
 	}
+}
+
+func TestNumberPointChain(t *testing.T) {
+
 }

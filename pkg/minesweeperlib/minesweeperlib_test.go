@@ -1,9 +1,24 @@
-package minesweeperlib
+package minesweeperlib_test
 
 import (
+	"github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestGetBoard(t *testing.T) {
+	cases := [3]([2]int){
+		{3, 3},
+		{3, 6},
+		{6, 3},
+	}
+	for _, want := range cases {
+		res := *minesweeperlib.GetBoard(want[0], want[1])
+		actual := [2]int{len(res), len((res)[0])}
+		assert.Equal(t, want, actual)
+
+	}
+}
 
 func TestGetCellNumbers(t *testing.T) {
 	type CellNumbersTestCase struct {
@@ -11,14 +26,14 @@ func TestGetCellNumbers(t *testing.T) {
 		bombs      map[int]int
 		want       [][]int
 	}
-	cases := []CellNumbersTestCase{
+	cases := [4]CellNumbersTestCase{
 		{3, 3, map[int]int{1: 1}, [][]int{{1, 1, 1}, {1, -1, 1}, {1, 1, 1}}},
 		{3, 3, map[int]int{1: 2}, [][]int{{0, 1, 1}, {0, 1, -1}, {0, 1, 1}}},
 		{3, 3, map[int]int{0: 2}, [][]int{{0, 1, -1}, {0, 1, 1}, {0, 0, 0}}},
 		{3, 3, map[int]int{0: 2, 1: 1}, [][]int{{1, 2, -1}, {1, -1, 2}, {1, 1, 1}}},
 	}
 	for _, c := range cases {
-		assert.Equal(t, c.want, GetCellNumbers(c.rows, c.cols, c.bombs))
+		assert.Equal(t, &c.want, minesweeperlib.GetCellNumbers(minesweeperlib.GetBoard(c.cols, c.rows), c.bombs))
 	}
 
 }

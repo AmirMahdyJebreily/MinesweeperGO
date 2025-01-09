@@ -3,6 +3,7 @@ package minesweeperlib_test
 import (
 	"github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
 	"github.com/stretchr/testify/assert"
+	"slices"
 	"testing"
 )
 
@@ -16,24 +17,28 @@ func TestGetBoard(t *testing.T) {
 		res := *minesweeperlib.GetBoard(want[0], want[1])
 		actual := [2]int{len(res), len((res)[0])}
 		assert.Equal(t, want, actual)
-
 	}
+}
+
+func TestGetRandomBombs(t *testing.T) {
+	bombs := *minesweeperlib.GetRandomBombs(3, 3, 1, 1, 8)
+	assert.False(t, slices.Contains(bombs, [2]int{1, 1}))
 }
 
 func TestGetCellNumbers(t *testing.T) {
 	type CellNumbersTestCase struct {
 		rows, cols int
-		bombs      map[int]int
+		bombs      [][2]int
 		want       [][]int
 	}
 	cases := [4]CellNumbersTestCase{
-		{3, 3, map[int]int{1: 1}, [][]int{{1, 1, 1}, {1, -1, 1}, {1, 1, 1}}},
-		{3, 3, map[int]int{1: 2}, [][]int{{0, 1, 1}, {0, 1, -1}, {0, 1, 1}}},
-		{3, 3, map[int]int{0: 2}, [][]int{{0, 1, -1}, {0, 1, 1}, {0, 0, 0}}},
-		{3, 3, map[int]int{0: 2, 1: 1}, [][]int{{1, 2, -1}, {1, -1, 2}, {1, 1, 1}}},
+		{3, 3, [][2]int{{1, 1}}, [][]int{{1, 1, 1}, {1, -1, 1}, {1, 1, 1}}},
+		{3, 3, [][2]int{{1, 2}}, [][]int{{0, 1, 1}, {0, 1, -1}, {0, 1, 1}}},
+		{3, 3, [][2]int{{0, 2}}, [][]int{{0, 1, -1}, {0, 1, 1}, {0, 0, 0}}},
+		{3, 3, [][2]int{{0: 2}, {1: 1}}, [][]int{{1, 2, -1}, {1, -1, 2}, {1, 1, 1}}},
 	}
 	for _, c := range cases {
-		assert.Equal(t, &c.want, minesweeperlib.GetCellNumbers(minesweeperlib.GetBoard(c.cols, c.rows), c.bombs))
+		assert.Equal(t, &c.want, minesweeperlib.GetCellNumbers(minesweeperlib.GetBoard(c.cols, c.rows), &c.bombs))
 	}
 
 }

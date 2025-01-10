@@ -9,16 +9,20 @@ import (
 )
 
 const unoppend = "∙"
+const zero = "O"
 const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
 
 // use \x1b[1;31m ansi escape code for colorise
 func coloriseNumber(n int) string {
+	if n == 0 {
+		return zero
+	}
 	return fmt.Sprintf("\x1b[1;3%vm%v\x1b[0m", n, n)
 }
 
 func SprintCell(data string, selected bool) string {
 	if selected {
-		return fmt.Sprintf("\x1b[5m[%v]\u001B[25m  ", data)
+		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m  ", data)
 	}
 	return fmt.Sprintf(" %v   ", data)
 }
@@ -26,7 +30,7 @@ func SprintCell(data string, selected bool) string {
 func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]int) *strings.Builder {
 	rows, cols := len(*board), len((*board)[0])
 	var res strings.Builder
-	res.WriteString("\033[H\033[2J") // Clear the old screen before print new board
+	res.WriteString("\033[H\033[J") // Clear the old screen before print new board
 	if bombs != nil {
 		res.WriteString(fmt.Sprintf(" .:: [Size: %v×%v] [Bombs: %v]\n", cols, rows, len(*bombs)))
 	}
@@ -59,7 +63,7 @@ func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]
 	for j := 0; j < cols; j++ {
 		res.WriteString(fmt.Sprintf("  %2d ", j+1))
 	}
-	res.WriteString(fmt.Sprintf("\n"))
+	res.WriteString(fmt.Sprintf("\n\n .:: \x1b[1;34m[Arrows: Move] [O: Open Cell] [F: Flag]\x1b[1;0m"))
 
 	return &res
 }
@@ -123,7 +127,7 @@ func main() {
 			selected[1]--
 		}
 
-		if (char == 'o' || char == 'O') && selected[0] < cols {
+		if (char == 'o' || char == 'O' || key == keyboard.KeyEnter) && selected[0] < cols {
 			if bombs == nil {
 				x0, y0 = selected[0], selected[1]
 				oppend = make([][2]int, 0)
@@ -135,7 +139,7 @@ func main() {
 
 		// update screen
 		fmt.Println((*Sprintgridf(board, bombs, &oppend, selected)).String())
-		fmt.Print("[Arrowkeys: move] [O: Open Cell] [F: Flag]")
+		fmt.Print()
 
 	}
 }

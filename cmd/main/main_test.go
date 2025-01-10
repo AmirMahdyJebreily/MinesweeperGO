@@ -1,1 +1,1 @@
-package minesweeperterminal
+package main

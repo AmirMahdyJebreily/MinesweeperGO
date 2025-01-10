@@ -7,22 +7,22 @@ import (
 )
 
 func GetBoard(cols, rows int) *[][]int {
-	board := make([][]int, cols)
+	board := make([][]int, rows)
 
 	// init the board
 	for i := range board {
-		board[i] = make([]int, rows)
+		board[i] = make([]int, cols)
 	}
 
 	return &board
 }
 func GetRandomBombs(cols, rows, x0, y0 int, count int) *[][2]int {
 
-	bombs := make([][2]int, count)
+	bombs := make([][2]int, 0)
 
 	// The radius of the circle that determines how many points around the point (x0, y0) are forbidden points.
 	const radiusFactor = 0.15            // TODO:Add the degree of hardness: the harder, the smaller the radius
-	var exclusionCenter = [2]int{10, 10} // the point that user clicked on it for first (x0 , y0)
+	var exclusionCenter = [2]int{x0, y0} // the point that user clicked on it for first (x0 , y0)
 
 	// The radius of the circle must be specified based on the width of the page.
 	calculateExclusionRadius := func() float64 {
@@ -36,7 +36,7 @@ func GetRandomBombs(cols, rows, x0, y0 int, count int) *[][2]int {
 	}
 
 	isFree := func(x, y int) bool {
-		return x >= 0 && x < cols && y >= 0 && y < rows && slices.Contains(bombs, [2]int{x, y}) && !isInExclusionZone(x, y)
+		return x >= 0 && x < cols && y >= 0 && y < rows && !slices.Contains(bombs, [2]int{x, y}) && !isInExclusionZone(x, y)
 	}
 
 	attachParticle := func(x, y int) {
@@ -60,8 +60,8 @@ func GetRandomBombs(cols, rows, x0, y0 int, count int) *[][2]int {
 	return &bombs
 }
 func GetCellNumbers(board *[][]int, bombs *[][2]int) *[][]int {
-	cols := len(*board)
-	rows := len((*board)[0])
+	rows := len(*board)
+	cols := len((*board)[0])
 
 	for bi := range *bombs {
 		x, y := (*bombs)[bi][0], (*bombs)[bi][1]

@@ -1,68 +1,85 @@
-/*
-The terminal interface for minesweeper pkg
-*/
-
 package main
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
+	"github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
 )
 
-const (
-	gridSize     = 20 // اندازه ماتریس
-	numParticles = 50 // تعداد ذرات
-)
+const untaped = "∙"
+const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
 
-var grid [gridSize][gridSize]int // محیط ماتریس
+func Sprintgridf(board *[][]int, bombs *[][2]int) string {
+	cols, rows := len(*board), len((*board)[0])
+	res := ""
+	for i := 0; i < cols; i++ {
+		if i == 0 {
+			res += "      "
+			for j := 0; j < rows; j++ {
+				res += fmt.Sprintf(" %02d  ", j+1)
+			}
+			res += fmt.Sprintf("\n\n")
 
-// بررسی اینکه آیا نقطه خالی است
-func isFree(x, y int) bool {
-	return x >= 0 && x < gridSize && y >= 0 && y < gridSize && grid[x][y] == 0
-}
-
-// اتصال ذره به شبکه
-func attachParticle(x, y int) {
-	grid[x][y] = 1
-}
-
-// تولید ذرات و پراکنده کردن آنها
-func randomWalk(x, y int) (int, int) {
-	directions := [][2]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} // حرکت به اطراف
-	for {
-		dir := directions[rand.Intn(len(directions))]
-		newX, newY := x+dir[0], y+dir[1]
-		if !isFree(newX, newY) {
-			return newX, newY
 		}
-		x, y = newX, newY
+		res += fmt.Sprintf(" %02d     ", i+1)
+	lines:
+		for j := 0; j < rows; j++ {
+			if bombs != nil {
+				thisPos := [2]int{i, j}
+				for _, bom := range *bombs {
+					if thisPos == bom {
+						res += fmt.Sprintf("%v    ", bomb)
+						continue lines
+					}
+				}
+			}
+			res += fmt.Sprintf("%v    ", (*board)[i][j])
+
+		}
+		res += "\n"
 	}
+	return res
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
-	// قرار دادن اولین نقطه (seed)
-	center := gridSize / 2
-	grid[center][center] = 1
-
-	for i := 0; i < numParticles; i++ {
-		// شروع از یک نقطه تصادفی
-		x, y := rand.Intn(gridSize), rand.Intn(gridSize)
-		x, y = randomWalk(x, y)
-		attachParticle(x, y)
-	}
-
-	// نمایش ماتریس
-	for _, row := range grid {
-		for _, cell := range row {
-			if cell == 1 {
-				fmt.Print("* ")
-			} else {
-				fmt.Print(". ")
-			}
+	var cols, rows int
+	fmt.Println("Wellcome to CodeAgha's MineSweeper Game in terminal")
+	for {
+		fmt.Print("Enter The Columns,Rows: ")
+		_, scanError := fmt.Scanf("%v,%v", &cols, &rows)
+		if scanError != nil {
+			fmt.Println("Please Input values in format above: Columns,Rows")
+			continue
 		}
-		fmt.Println()
+		break
 	}
+	var bombsCount int
+	for {
+		fmt.Print("Enter The count of bombs: ")
+		_, scanError := fmt.Scanf("%v", &bombsCount)
+		if scanError != nil {
+			fmt.Println("Please Input values in format above: Columns,Rows")
+			continue
+		}
+		break
+	}
+
+	board := minesweeperlib.GetBoard(cols, rows)
+	fmt.Println(Sprintgridf(board, nil))
+	var x0, y0 int
+	for {
+		fmt.Print("Select: ")
+		_, scanError := fmt.Scanf("%v,%v", &x0, &y0)
+		if scanError != nil {
+			fmt.Println("Please Input values in format above: Columns,Rows")
+			continue
+		}
+		break
+	}
+	bombs := minesweeperlib.GetRandomBombs(cols, rows, x0, y0, bombsCount)
+	board = minesweeperlib.GetCellNumbers(board, bombs)
+	fmt.Println(Sprintgridf(board, bombs))
+
+	//for {
+	//
+	//}
 }

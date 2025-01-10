@@ -86,7 +86,7 @@ func GetCellNumbers(board *[][]int, bombs *[][2]int) *[][]int {
 }
 
 func findZeroNeighbors(x0, y0 int, openeds *map[[2]int]struct{}, board *[][]int) {
-	directions := [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	directions := [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}}
 	for _, direction := range directions {
 		x, y := x0+direction[0], y0+direction[1]
 		if x < 0 || x >= len((*board)[0]) || y < 0 || y >= len(*board) {

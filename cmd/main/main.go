@@ -22,9 +22,9 @@ func coloriseNumber(n int) string {
 
 func SprintCell(data string, selected bool) string {
 	if selected {
-		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m", data)
+		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m ", data)
 	}
-	return fmt.Sprintf(" %v ", data)
+	return fmt.Sprintf(" %v  ", data)
 }
 
 func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]int) *strings.Builder {
@@ -61,7 +61,7 @@ func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]
 	}
 	res.WriteString(fmt.Sprintf("\n      "))
 	for j := 0; j < cols; j++ {
-		res.WriteString(fmt.Sprintf(" %2d", j+1))
+		res.WriteString(fmt.Sprintf("  %02d", j+1))
 	}
 	res.WriteString(fmt.Sprintf("\n\n .:: \x1b[1;34m[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]\x1b[1;0m"))
 
@@ -129,7 +129,7 @@ func main() {
 		}
 
 		if (char == 'q' || char == 'Q' || key == keyboard.KeyEsc) && selected[0] < cols {
-			fmt.Print("\u001B[?47l\u001B[?25h")
+			fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
 			break
 		}
 
@@ -140,7 +140,7 @@ func main() {
 				bombs = minesweeperlib.GetRandomBombs(cols, rows, x0-1, y0-1, bombsCount)
 				board = minesweeperlib.GetCellNumbers(board, bombs)
 			}
-			oppend = append((oppend), selected)
+			oppend = slices.Concat(oppend, minesweeperlib.GetOpeneds(board, selected))
 		}
 
 		// update screen

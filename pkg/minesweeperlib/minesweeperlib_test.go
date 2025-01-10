@@ -42,3 +42,9 @@ func TestGetCellNumbers(t *testing.T) {
 	}
 
 }
+
+func TestGetOpeneds(t *testing.T) {
+	point := [2]int{2, 2}
+	o := minesweeperlib.GetOpeneds(minesweeperlib.GetBoard(3, 3), point)
+	assert.Equal(t, o[0], point)
+}

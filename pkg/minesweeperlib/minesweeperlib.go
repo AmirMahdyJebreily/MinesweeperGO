@@ -84,3 +84,39 @@ func GetCellNumbers(board *[][]int, bombs *[][2]int) *[][]int {
 
 	return board
 }
+
+func findZeroNeighbors(x0, y0 int, openeds *map[[2]int]struct{}, board *[][]int) {
+	directions := [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	for _, direction := range directions {
+		x, y := x0+direction[0], y0+direction[1]
+		if x < 0 || x >= len((*board)[0]) || y < 0 || y >= len(*board) {
+			continue
+		}
+		thisPos := [2]int{x, y}
+		if _, k := (*openeds)[thisPos]; !k && (*board)[y][x] != -1 {
+			(*openeds)[thisPos] = struct{}{}
+			if (*board)[y][x] == 0 {
+				findZeroNeighbors(x, y, openeds, board)
+			}
+		}
+	}
+}
+
+func GetOpeneds(board *[][]int, selected [2]int) [][2]int {
+	openeds := make(map[[2]int]struct{})
+	openeds[selected] = struct{}{}
+	res := make([][2]int, 0)
+	x0, y0 := selected[0], selected[1]
+	if (*board)[y0][x0] != 0 {
+		for key := range openeds {
+			res = append(res, key)
+		}
+		return res
+	}
+	findZeroNeighbors(x0, y0, &openeds, board)
+
+	for key := range openeds {
+		res = append(res, key)
+	}
+	return res
+}

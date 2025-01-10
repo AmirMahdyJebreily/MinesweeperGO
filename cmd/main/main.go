@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-const unoppend = "∙"
-const zero = "O"
+const unoppend = "\u001B[38;5;242m∙\u001B[1;0m"
+const zero = "\u001B[38;5;248m■\u001B[1;0m"
 const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
 
 // use \x1b[1;31m ansi escape code for colorise
@@ -22,9 +22,9 @@ func coloriseNumber(n int) string {
 
 func SprintCell(data string, selected bool) string {
 	if selected {
-		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m  ", data)
+		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m", data)
 	}
-	return fmt.Sprintf(" %v   ", data)
+	return fmt.Sprintf(" %v ", data)
 }
 
 func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]int) *strings.Builder {
@@ -61,14 +61,16 @@ func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]
 	}
 	res.WriteString(fmt.Sprintf("\n      "))
 	for j := 0; j < cols; j++ {
-		res.WriteString(fmt.Sprintf("  %2d ", j+1))
+		res.WriteString(fmt.Sprintf(" %2d", j+1))
 	}
-	res.WriteString(fmt.Sprintf("\n\n .:: \x1b[1;34m[Arrows: Move] [O: Open Cell] [F: Flag]\x1b[1;0m"))
+	res.WriteString(fmt.Sprintf("\n\n .:: \x1b[1;34m[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]\x1b[1;0m"))
 
 	return &res
 }
 
 func main() {
+	fmt.Println("\u001B[?47h") // save screen
+
 	if err := keyboard.Open(); err != nil {
 		panic(err)
 	}
@@ -97,14 +99,13 @@ func main() {
 		}
 		break
 	}
-
+	fmt.Print("\u001b[?25l") // hide mouse
 	board := minesweeperlib.GetBoard(cols, rows)
 	selected := [2]int{cols / 2, rows / 2}
 	fmt.Println((*Sprintgridf(board, nil, nil, selected)).String())
 	var x0, y0 int
 	var bombs *[][2]int = nil
 	var oppend [][2]int = nil
-
 	for {
 		char, key, err := keyboard.GetKey()
 		if err != nil {
@@ -125,6 +126,11 @@ func main() {
 
 		if key == keyboard.KeyArrowDown && selected[1] > 0 {
 			selected[1]--
+		}
+
+		if (char == 'q' || char == 'Q' || key == keyboard.KeyEsc) && selected[0] < cols {
+			fmt.Print("\u001B[?47l\u001B[?25h")
+			break
 		}
 
 		if (char == 'o' || char == 'O' || key == keyboard.KeyEnter) && selected[0] < cols {

@@ -122,8 +122,10 @@ func GetOpeneds(board *[][]int, selected [2]int) [][2]int {
 
 // States 0: still playing, 1: Winner!, 2: Loser
 func GetState(board *[][]int, bombsCount int, flaggeds map[[2]int]bool, point [2]int) int {
-	if (*board)[point[1]][point[0]] == -1 {
-		return 2 // The Game is over !
+	if flaggeds == nil {
+		if (*board)[point[1]][point[0]] == -1 {
+			return 2 // The Game is over !
+		}
 	}
 
 	if len(flaggeds) == bombsCount {

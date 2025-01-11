@@ -147,25 +147,6 @@ func main() {
 			} else if len(flaggeds) < bombsCount {
 				flaggeds[selected] = true
 			}
-
-			if len(flaggeds) == bombsCount {
-				trueFlags := true
-				for flagged := range flaggeds {
-					if (*board)[flagged[1]][flagged[0]] != -1 {
-						trueFlags = false
-						break
-					}
-				}
-				if trueFlags {
-					message = "\u001b[32mYou Win :)\u001b[1;0m"
-					inGame = false
-					fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
-					fmt.Println("Press something to exit\n")
-					fmt.Scanln()
-					fmt.Print("\u001B[?1049l\u001B[?25h")
-					break
-				}
-			}
 		}
 		if char == 'o' || char == 'O' || key == keyboard.KeyEnter {
 			if bombs == nil {
@@ -175,8 +156,19 @@ func main() {
 				board = minesweeperlib.GetCellNumbers(board, bombs)
 			}
 			oppend = slices.Concat(oppend, minesweeperlib.GetOpeneds(board, selected))
+		}
 
-			if slices.Contains(*bombs, selected) {
+		state := minesweeperlib.GetState(board, bombsCount, flaggeds, selected)
+		if state != 0 { // winner or loser
+			if state == 1 {
+				message = "\u001b[32mYou Win :)\u001b[1;0m"
+				inGame = false
+				fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
+				fmt.Println("Press something to exit\n")
+				fmt.Scanln()
+				fmt.Print("\u001B[?1049l\u001B[?25h")
+				break
+			} else if state == 2 {
 				message = "\u001b[31mGame Over :(\u001b[1;0m"
 				inGame = false
 				fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
@@ -186,7 +178,6 @@ func main() {
 				break
 			}
 		}
-
 		// update screen
 		fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, &oppend, selected, message)).String())
 		fmt.Print()

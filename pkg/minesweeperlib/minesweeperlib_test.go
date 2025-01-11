@@ -15,7 +15,7 @@ func TestGetBoard(t *testing.T) {
 	}
 	for _, want := range cases {
 		res := *minesweeperlib.GetBoard(want[0], want[1])
-		actual := [2]int{len(res), len((res)[0])}
+		actual := [2]int{len((res)[0]), len(res)}
 		assert.Equal(t, want, actual)
 	}
 }
@@ -33,9 +33,9 @@ func TestGetCellNumbers(t *testing.T) {
 	}
 	cases := [4]CellNumbersTestCase{
 		{3, 3, [][2]int{{1, 1}}, [][]int{{1, 1, 1}, {1, -1, 1}, {1, 1, 1}}},
-		{3, 3, [][2]int{{1, 2}}, [][]int{{0, 1, 1}, {0, 1, -1}, {0, 1, 1}}},
-		{3, 3, [][2]int{{0, 2}}, [][]int{{0, 1, -1}, {0, 1, 1}, {0, 0, 0}}},
-		{3, 3, [][2]int{{0: 2}, {1: 1}}, [][]int{{1, 2, -1}, {1, -1, 2}, {1, 1, 1}}},
+		{3, 3, [][2]int{{2, 1}}, [][]int{{0, 1, 1}, {0, 1, -1}, {0, 1, 1}}},
+		{3, 3, [][2]int{{2, 0}}, [][]int{{0, 1, -1}, {0, 1, 1}, {0, 0, 0}}},
+		{3, 3, [][2]int{{2, 0}, {1, 1}}, [][]int{{1, 2, -1}, {1, -1, 2}, {1, 1, 1}}},
 	}
 	for _, c := range cases {
 		assert.Equal(t, &c.want, minesweeperlib.GetCellNumbers(minesweeperlib.GetBoard(c.cols, c.rows), &c.bombs))

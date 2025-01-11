@@ -63,7 +63,6 @@ func Sprintgridf(board *[][]int, bombsCount int, flagged *map[[2]int]bool, oppen
 		res.WriteString("\n")
 	}
 	res.WriteString(fmt.Sprintf("\n%v", messages))
-	res.WriteString(fmt.Sprintf("\n[Arrows: Move] [O & Enter: Open Cell]\n[F & Space: Flag] [Q & ESC: Quit]"))
 
 	return &res
 }
@@ -79,7 +78,7 @@ func main() {
 	for {
 		fmt.Print("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ('y' is default) ? ")
 		input := "y"
-		_, scanError := fmt.Scanf("%v", &input)
+		_, scanError := fmt.Scanf("%v\n", &input)
 		if scanError != nil || strings.Trim(input, " ") != "n" {
 			theme.UsingEscapeCode = true
 			break
@@ -94,8 +93,8 @@ func main() {
 	var cols, rows int
 	fmt.Println("Wellcome to CodeAgha's MineSweeper Game in terminal")
 	for {
-		fmt.Print("\nEnter The Columns,Rows: ")
-		_, scanError := fmt.Scanf("\n%v,%v\n", &cols, &rows)
+		fmt.Print("Enter The Columns,Rows: ")
+		_, scanError := fmt.Scanf("%v,%v\n", &cols, &rows)
 		if scanError != nil {
 			fmt.Println("Please Input values in format: Columns,Rows")
 			continue
@@ -105,8 +104,8 @@ func main() {
 	var bombsCount int
 	for {
 		suggested := int(float64(cols*rows)*0.21) - 1
-		fmt.Printf("Enter The count of bombs: \u001b[s\n%v bombs is recommended, Press the Enter for it ;)\u001B[u ", suggested)
-		_, scanError := fmt.Scanln(&bombsCount)
+		fmt.Printf("\nEnter The count of bombs (default %v bombs): ", suggested)
+		_, scanError := fmt.Scanf("%v\n", &bombsCount)
 		if scanError != nil {
 			bombsCount = suggested
 			break
@@ -117,7 +116,8 @@ func main() {
 	board := minesweeperlib.GetBoard(cols, rows)
 	flaggeds := make(map[[2]int]bool, bombsCount)
 	selected := [2]int{cols / 2, rows / 2}
-	fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, "select a cell to start")).String())
+	message := "[Arrows: Move] [O & Enter: Open Cell]\n[F & Space: Flag] [Q & ESC: Quit]\nSelect a cell to start game"
+	fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
 	var x0, y0 int
 	var bombs *[][2]int = nil
 	var oppend [][2]int = nil
@@ -149,8 +149,6 @@ func main() {
 			break
 		}
 
-		message := ""
-
 		if char == 'f' || char == 'F' || key == keyboard.KeySpace {
 			if val, isflag := flaggeds[selected]; isflag || val {
 				delete(flaggeds, selected)
@@ -175,6 +173,7 @@ func main() {
 				oppend = make([][2]int, 0)
 				bombs = minesweeperlib.GetRandomBombs(cols, rows, x0, y0, bombsCount)
 				board = minesweeperlib.GetCellNumbers(board, bombs)
+				message = "[Arrows: Move] [O & Enter: Open Cell]\n[F & Space: Flag] [Q & ESC: Quit]"
 			}
 			oppend = slices.Concat(oppend, minesweeperlib.GetOpeneds(board, selected))
 

@@ -10,7 +10,8 @@ import (
 
 const unoppend = "\u001B[38;5;242m∙\u001B[1;0m"
 const zero = "\u001B[38;5;248m■\u001B[1;0m"
-const bomb = "\u001b[41m\u001B[35mX\u001B[0m"
+const bomb = "\u001b[101m\u001B[31mX\u001B[0m"
+const flag = "\u001b[102m\u001B[36mF\u001B[0m"
 
 // use \x1b[1;31m ansi escape code for colorise
 func coloriseNumber(n int) string {
@@ -22,31 +23,39 @@ func coloriseNumber(n int) string {
 
 func SprintCell(data string, selected bool) string {
 	if selected {
-		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m ", data)
+		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m", data)
 	}
-	return fmt.Sprintf(" %v  ", data)
+
+	if data == flag {
+		return fmt.Sprintf("\u001B[102m\u001B[36m[F]\u001B[0m")
+	}
+	if data == bomb {
+		return fmt.Sprintf("\u001B[101m\u001B[31m[x]\u001B[0m")
+	}
+
+	return fmt.Sprintf(" %v ", data)
 }
 
-func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]int) *strings.Builder {
+func Sprintgridf(board *[][]int, bombsCount int, flagged *map[[2]int]bool, oppend *[][2]int, selected [2]int, messages string) *strings.Builder {
 	rows, cols := len(*board), len((*board)[0])
 	var res strings.Builder
 	res.WriteString("\033[H\033[J") // Clear the old screen before print new board
-	if bombs != nil {
-		res.WriteString(fmt.Sprintf(" .:: [Size: %v×%v] [Bombs: %v]\n", cols, rows, len(*bombs)))
-	}
+	res.WriteString(fmt.Sprintf(" [Size: %v×%v] [Bombs: %v] [Flags: %v]\n", cols, rows, bombsCount, bombsCount-len(*flagged)))
 	for i := rows - 1; i >= 0; i-- {
-		res.WriteString(fmt.Sprintf(" %2d     ", i+1))
 	lines:
 		for j := 0; j < cols; j++ {
 			isSelected := [2]int{j, i} == selected
-			if oppend == nil {
-				res.WriteString(SprintCell(unoppend, isSelected))
+
+			if _, isflag := (*flagged)[[2]int{j, i}]; isflag {
+				res.WriteString(SprintCell(flag, isSelected))
 				continue lines
 			}
 
-			if !slices.Contains(*oppend, [2]int{j, i}) {
-				res.WriteString(SprintCell(unoppend, isSelected))
-				continue lines
+			if (oppend) != nil {
+				if !slices.Contains(*oppend, [2]int{j, i}) {
+					res.WriteString(SprintCell(unoppend, isSelected))
+					continue lines
+				}
 			}
 
 			if (*board)[i][j] == -1 {
@@ -55,15 +64,11 @@ func Sprintgridf(board *[][]int, bombs *[][2]int, oppend *[][2]int, selected [2]
 			}
 
 			res.WriteString(SprintCell(coloriseNumber((*board)[i][j]), isSelected))
-
 		}
 		res.WriteString("\n")
 	}
-	res.WriteString(fmt.Sprintf("\n      "))
-	for j := 0; j < cols; j++ {
-		res.WriteString(fmt.Sprintf("  %02d", j+1))
-	}
-	res.WriteString(fmt.Sprintf("\n\n .:: \x1b[1;34m[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]\x1b[1;0m"))
+	res.WriteString(fmt.Sprintf("\n %v", messages))
+	res.WriteString(fmt.Sprintf("\n .:: \x1b[1;34m[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]\x1b[1;0m"))
 
 	return &res
 }
@@ -99,14 +104,16 @@ func main() {
 		}
 		break
 	}
-	fmt.Print("\u001b[?25l") // hide mouse
+	//fmt.Print("\u001b[?25l") // hide mouse
 	board := minesweeperlib.GetBoard(cols, rows)
+	flaggeds := make(map[[2]int]bool, bombsCount)
 	selected := [2]int{cols / 2, rows / 2}
-	fmt.Println((*Sprintgridf(board, nil, nil, selected)).String())
+	fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, "select a cell to start")).String())
 	var x0, y0 int
 	var bombs *[][2]int = nil
 	var oppend [][2]int = nil
-	for {
+	inGame := true
+	for inGame {
 		char, key, err := keyboard.GetKey()
 		if err != nil {
 			panic(err)
@@ -128,24 +135,61 @@ func main() {
 			selected[1]--
 		}
 
-		if (char == 'q' || char == 'Q' || key == keyboard.KeyEsc) && selected[0] < cols {
+		if char == 'q' || char == 'Q' || key == keyboard.KeyEsc {
 			fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
 			break
 		}
 
-		if (char == 'o' || char == 'O' || key == keyboard.KeyEnter) && selected[0] < cols {
+		message := ""
+
+		if char == 'f' || char == 'F' || key == keyboard.KeySpace {
+			if val, isflag := flaggeds[selected]; isflag || val {
+				delete(flaggeds, selected)
+			} else if len(flaggeds) < bombsCount {
+				flaggeds[selected] = true
+			}
+
+			if len(flaggeds) == bombsCount {
+				trueFlags := true
+				for flagged := range flaggeds {
+					if (*board)[flagged[1]][flagged[0]] != -1 {
+						trueFlags = false
+						break
+					}
+				}
+				if trueFlags {
+					message = "\u001b[32mYou Win :)\u001b[1;0m"
+					inGame = false
+					fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
+					fmt.Println("Press something to exit")
+					fmt.Scanln()
+					fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
+					break
+				}
+			}
+		}
+		if char == 'o' || char == 'O' || key == keyboard.KeyEnter {
 			if bombs == nil {
 				x0, y0 = selected[0], selected[1]
 				oppend = make([][2]int, 0)
-				bombs = minesweeperlib.GetRandomBombs(cols, rows, x0-1, y0-1, bombsCount)
+				bombs = minesweeperlib.GetRandomBombs(cols, rows, x0, y0, bombsCount)
 				board = minesweeperlib.GetCellNumbers(board, bombs)
 			}
 			oppend = slices.Concat(oppend, minesweeperlib.GetOpeneds(board, selected))
+
+			if slices.Contains(*bombs, selected) {
+				message = "\u001b[31mGame Over :(\u001b[1;0m"
+				inGame = false
+				fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
+				fmt.Println("Press something to exit")
+				fmt.Scanln()
+				fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
+				break
+			}
 		}
 
 		// update screen
-		fmt.Println((*Sprintgridf(board, bombs, &oppend, selected)).String())
+		fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, &oppend, selected, message)).String())
 		fmt.Print()
-
 	}
 }

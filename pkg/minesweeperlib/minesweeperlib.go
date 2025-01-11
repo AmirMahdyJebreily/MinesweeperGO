@@ -21,7 +21,7 @@ func GetRandomBombs(cols, rows, x0, y0 int, count int) *[][2]int {
 	bombs := make([][2]int, 0)
 
 	// The radius of the circle that determines how many points around the point (x0, y0) are forbidden points.
-	const radiusFactor = 0.16            // TODO:Add the degree of hardness: the harder, the smaller the radius
+	const radiusFactor = 0.1             // TODO:Add the degree of hardness: the harder, the smaller the radius
 	var exclusionCenter = [2]int{x0, y0} // the point that user clicked on it for first (x0 , y0)
 
 	// The radius of the circle must be specified based on the width of the page.
@@ -101,7 +101,6 @@ func findZeroNeighbors(x0, y0 int, openeds *map[[2]int]struct{}, board *[][]int)
 		}
 	}
 }
-
 func GetOpeneds(board *[][]int, selected [2]int) [][2]int {
 	openeds := make(map[[2]int]struct{})
 	openeds[selected] = struct{}{}

@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+var theme Theme
+
 // use \x1b[1;31m ansi escape code for colorise
 func coloriseNumber(n int) string {
 	if n == 0 {
@@ -75,6 +77,17 @@ func main() {
 	defer func() {
 		_ = keyboard.Close()
 	}()
+
+	for {
+		fmt.Println("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ? ")
+		input := "n"
+		_, scanError := fmt.Scanf("%v", &input)
+		if scanError != nil || input != "y" {
+			theme.UsingEscapeCode = false
+			break
+		}
+		break
+	}
 
 	var cols, rows int
 	fmt.Println("Wellcome to CodeAgha's MineSweeper Game in terminal")

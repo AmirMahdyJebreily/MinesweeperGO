@@ -74,8 +74,6 @@ func Sprintgridf(board *[][]int, bombsCount int, flagged *map[[2]int]bool, oppen
 }
 
 func main() {
-	fmt.Println("\u001B[?47h") // save screen
-
 	if err := keyboard.Open(); err != nil {
 		panic(err)
 	}
@@ -96,15 +94,16 @@ func main() {
 	}
 	var bombsCount int
 	for {
-		fmt.Print("Enter The count of bombs: ")
+		suggested := int(float64(cols*rows)*0.21) - 1
+		fmt.Printf("Enter The count of bombs: \u001b[s\n\u001b[90m(%v) bombs is recommended, Press the Enter for it ;)\u001B[1;0m\u001B[u ", suggested)
 		_, scanError := fmt.Scanln(&bombsCount)
 		if scanError != nil {
-			fmt.Println("Please Input a number")
-			continue
+			bombsCount = suggested
+			break
 		}
 		break
 	}
-	//fmt.Print("\u001b[?25l") // hide mouse
+	fmt.Println("\n\u001B[?1049h\u001B[H\u001B[J\u001B[?25l") // save screen
 	board := minesweeperlib.GetBoard(cols, rows)
 	flaggeds := make(map[[2]int]bool, bombsCount)
 	selected := [2]int{cols / 2, rows / 2}
@@ -136,7 +135,7 @@ func main() {
 		}
 
 		if char == 'q' || char == 'Q' || key == keyboard.KeyEsc {
-			fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
+			fmt.Print("\u001B[?1049l\u001B[?25h")
 			break
 		}
 
@@ -161,9 +160,9 @@ func main() {
 					message = "\u001b[32mYou Win :)\u001b[1;0m"
 					inGame = false
 					fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
-					fmt.Println("Press something to exit")
+					fmt.Println("Press something to exit\n")
 					fmt.Scanln()
-					fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
+					fmt.Print("\u001B[?1049l\u001B[?25h")
 					break
 				}
 			}
@@ -181,9 +180,9 @@ func main() {
 				message = "\u001b[31mGame Over :(\u001b[1;0m"
 				inGame = false
 				fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
-				fmt.Println("Press something to exit")
+				fmt.Println("Press something to exit\n")
 				fmt.Scanln()
-				fmt.Print("\u001B[H\u001B[J\u001B[?47l\u001B[?25h\u001B[H")
+				fmt.Print("\u001B[?1049l\u001B[?25h")
 				break
 			}
 		}

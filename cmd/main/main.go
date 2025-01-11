@@ -10,24 +10,22 @@ import (
 
 var theme Theme
 
-// use \x1b[1;31m ansi escape code for colorise
-func coloriseNumber(n int) string {
-	if n == 0 {
-		return zero
-	}
-	return fmt.Sprintf("\x1b[1;3%vm%v\x1b[0m", n, n)
-}
-
 func SprintCell(data string, selected bool) string {
 	if selected {
-		return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m", data)
+		if theme.UsingEscapeCode {
+			return fmt.Sprintf("\u001B[5m[\u001B[25m%v\u001B[5m]\x1b[25m", data)
+		}
+
+		return fmt.Sprintf("[%v]", data)
 	}
 
-	if data == flag {
-		return fmt.Sprintf("\u001B[102m\u001B[36m[F]\u001B[0m")
-	}
-	if data == bomb {
-		return fmt.Sprintf("\u001B[101m\u001B[31m[x]\u001B[0m")
+	if theme.UsingEscapeCode {
+		if data == flag {
+			return fmt.Sprintf("\u001B[102m\u001B[36m[%v]\u001B[0m", flag)
+		}
+		if data == bomb {
+			return fmt.Sprintf("\u001B[101m\u001B[31m[%v]\u001B[0m", bomb)
+		}
 	}
 
 	return fmt.Sprintf(" %v ", data)
@@ -44,28 +42,28 @@ func Sprintgridf(board *[][]int, bombsCount int, flagged *map[[2]int]bool, oppen
 			isSelected := [2]int{j, i} == selected
 
 			if _, isflag := (*flagged)[[2]int{j, i}]; isflag {
-				res.WriteString(SprintCell(flag, isSelected))
+				res.WriteString(SprintCell(theme.DefaultSymbol(flag), isSelected))
 				continue lines
 			}
 
 			if (oppend) != nil {
 				if !slices.Contains(*oppend, [2]int{j, i}) {
-					res.WriteString(SprintCell(unoppend, isSelected))
+					res.WriteString(SprintCell(theme.DefaultSymbol(unopend), isSelected))
 					continue lines
 				}
 			}
 
 			if (*board)[i][j] == -1 {
-				res.WriteString(SprintCell(bomb, isSelected))
+				res.WriteString(SprintCell(theme.DefaultSymbol(bomb), isSelected))
 				continue lines
 			}
 
-			res.WriteString(SprintCell(coloriseNumber((*board)[i][j]), isSelected))
+			res.WriteString(SprintCell(theme.ColoriseNumber((*board)[i][j]), isSelected))
 		}
 		res.WriteString("\n")
 	}
-	res.WriteString(fmt.Sprintf("\n %v", messages))
-	res.WriteString(fmt.Sprintf("\n .:: \x1b[1;34m[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]\x1b[1;0m"))
+	res.WriteString(fmt.Sprintf("\n%v", messages))
+	res.WriteString(fmt.Sprintf("\n[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]"))
 
 	return &res
 }
@@ -79,20 +77,21 @@ func main() {
 	}()
 
 	for {
-		fmt.Println("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ? ")
+		fmt.Print("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ? ")
 		input := "n"
 		_, scanError := fmt.Scanf("%v", &input)
 		if scanError != nil || input != "y" {
 			theme.UsingEscapeCode = false
 			break
 		}
+		theme.UsingEscapeCode = true
 		break
 	}
 
 	var cols, rows int
 	fmt.Println("Wellcome to CodeAgha's MineSweeper Game in terminal")
 	for {
-		fmt.Print("Enter The Columns,Rows: ")
+		fmt.Print("\nEnter The Columns,Rows: ")
 		_, scanError := fmt.Scanf("%v,%v\n", &cols, &rows)
 		if scanError != nil {
 			fmt.Println("Please Input values in format: Columns,Rows")
@@ -103,7 +102,7 @@ func main() {
 	var bombsCount int
 	for {
 		suggested := int(float64(cols*rows)*0.21) - 1
-		fmt.Printf("Enter The count of bombs: \u001b[s\n\u001b[90m(%v) bombs is recommended, Press the Enter for it ;)\u001B[1;0m\u001B[u ", suggested)
+		fmt.Printf("Enter The count of bombs: \u001b[s\n(%v) bombs is recommended, Press the Enter for it ;)\u001B[u ", suggested)
 		_, scanError := fmt.Scanln(&bombsCount)
 		if scanError != nil {
 			bombsCount = suggested
@@ -157,7 +156,7 @@ func main() {
 
 				state := minesweeperlib.GetState(board, bombsCount, flaggeds, selected)
 				if state == 1 {
-					message = "\u001b[32mYou Win :)\u001b[1;0m"
+					message = "You Win :)"
 					inGame = false
 					fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
 					fmt.Println("Press something to exit\n")
@@ -178,7 +177,7 @@ func main() {
 
 			state := minesweeperlib.GetState(board, bombsCount, nil, selected)
 			if state == 2 {
-				message = "\u001b[31mGame Over :(\u001b[1;0m"
+				message = "Game Over :("
 				inGame = false
 				fmt.Println((*Sprintgridf(board, bombsCount, &flaggeds, nil, selected, message)).String())
 				fmt.Println("Press something to exit\n")

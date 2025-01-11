@@ -8,11 +8,6 @@ import (
 	"strings"
 )
 
-const unoppend = "\u001B[38;5;242m∙\u001B[1;0m"
-const zero = "\u001B[38;5;248m■\u001B[1;0m"
-const bomb = "\u001b[101m\u001B[31mX\u001B[0m"
-const flag = "\u001b[102m\u001B[36mF\u001B[0m"
-
 // use \x1b[1;31m ansi escape code for colorise
 func coloriseNumber(n int) string {
 	if n == 0 {

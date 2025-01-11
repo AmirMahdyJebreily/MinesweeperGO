@@ -63,7 +63,7 @@ func Sprintgridf(board *[][]int, bombsCount int, flagged *map[[2]int]bool, oppen
 		res.WriteString("\n")
 	}
 	res.WriteString(fmt.Sprintf("\n%v", messages))
-	res.WriteString(fmt.Sprintf("\n[Arrows: Move] [O & Enter: Open Cell] [F: Flag] [Q & ESC: Quit]"))
+	res.WriteString(fmt.Sprintf("\n[Arrows: Move] [O & Enter: Open Cell]\n[F & Space: Flag] [Q & ESC: Quit]"))
 
 	return &res
 }
@@ -77,10 +77,13 @@ func main() {
 	}()
 
 	for {
-		fmt.Print("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ? ")
-		input := "n"
+		fmt.Print("Do you want to use ANSI Escape codes [(y)Yes/(n)No] ('y' is default) ? ")
+		input := "y"
 		_, scanError := fmt.Scanf("%v", &input)
-		if scanError != nil || input != "y" {
+		if scanError != nil || strings.Trim(input, " ") != "n" {
+			theme.UsingEscapeCode = true
+			break
+		} else if strings.Trim(input, " ") == "n" {
 			theme.UsingEscapeCode = false
 			break
 		}
@@ -92,7 +95,7 @@ func main() {
 	fmt.Println("Wellcome to CodeAgha's MineSweeper Game in terminal")
 	for {
 		fmt.Print("\nEnter The Columns,Rows: ")
-		_, scanError := fmt.Scanf("%v,%v\n", &cols, &rows)
+		_, scanError := fmt.Scanf("\n%v,%v\n", &cols, &rows)
 		if scanError != nil {
 			fmt.Println("Please Input values in format: Columns,Rows")
 			continue
@@ -102,7 +105,7 @@ func main() {
 	var bombsCount int
 	for {
 		suggested := int(float64(cols*rows)*0.21) - 1
-		fmt.Printf("Enter The count of bombs: \u001b[s\n(%v) bombs is recommended, Press the Enter for it ;)\u001B[u ", suggested)
+		fmt.Printf("Enter The count of bombs: \u001b[s\n%v bombs is recommended, Press the Enter for it ;)\u001B[u ", suggested)
 		_, scanError := fmt.Scanln(&bombsCount)
 		if scanError != nil {
 			bombsCount = suggested

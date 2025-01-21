@@ -1,8 +1,7 @@
 # Minesweeper GO  
 A Go implementation of Minesweeper, currently available in terminal. In the future it will also compile for wasm and you can use it in your web projects
 
-
-![Minesweeper Game](./docs/img/MinesweeperGo.webp)
+![Running in Windows](./docs/img/running-in-windows.jpg)
 ## How to play ? 🖥️
 The game is published for test on windows now. you can [download](https://github.com/AmirMahdyJebreily/MinesweeperGO/releases/tag/win-test) the .exe or you can build your exe :
 ```shell
@@ -33,6 +32,9 @@ This page will be updated gradually and I'll upload a YouTube video reporting on
 
 ## Why Minesweeper? 💣
 Why not?! It's a logical and engaging game that always tells you that something must have left a mark or this number shouldn't be here! If you like challenging your brain, this game will really entertain you!
+
+![Minesweeper Game](./docs/img/MinesweeperGo.webp)
+
 
 ## How do I make one for myself? 🧑‍💻🧑‍💻
 Use the `minesweeperlib` to create your own Minesweeper (as an exercise or to help students, etc.). It's provides just **5 functions** that allow you to create your Minesweeper in any platform (such as a browser):

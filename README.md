@@ -1,6 +1,9 @@
 # Minesweeper GO  
 A Go implementation of Minesweeper, currently available in terminal. In the future it will also compile for wasm and you can use it in your web projects
-## How to play ?
+
+
+![Minesweeper Game](./docs/img/MinesweeperGo.webp)
+## How to play ? 🖥️
 The game is published for test on windows now. you can [download](https://github.com/AmirMahdyJebreily/MinesweeperGO/releases/tag/win-test) the .exe or you can build your exe :
 ```shell
 git clone https://github.com/AmirMahdyJebreily/MinesweeperGO.git && cd MinesweeperGO
@@ -17,7 +20,7 @@ enjoy the game
 
 but in the future you can play in Unix and Windows environments (under the terminal).
 
-## Why did I write this code?
+## Why did I write this code? 🤔
 You might ask, "What unemployed programmer would implement such an old and boring game in Go?" But I have to tell you that first, I am not unemployed, and second, this game is not boring. I develop and maintain this codebase for this two reasons.
 
 First, many programmers in the 90s had fun making games that ran in terminal or DOS environments. Today, there are many engines for making games that make the programmer's job easier and allow the game developer to focus on the game itself, not on how to present a graphical environment on a particular game console.
@@ -28,7 +31,10 @@ Secondly, I myself wanted to check where exactly Go could be run. I used other l
 .NET runs wherever you can install its runtime, but the .NET runtime is much heavier than Go and cannot be run on every operating system, and for me, Go is a gateway to other operating systems and environments. I'm trying to install old and new operating systems on virtual machines (probably this one I made myself), and run this program on them to see where exactly go can be. I also have a Nano Pi 2 Fire at home, which does the same thing as a Raspberry Pi, but with a bit less capabilities! I've also ported it to different SBCs and maybe even different Micro Controllers to see exactly how far I can push Go. (TinyGo is a compiler that I hope will help me!)
 This page will be updated gradually and I'll upload a YouTube video reporting on this exciting zero!
 
-## How do I make one for myself?
+## Why Minesweeper? 💣
+Why not?! It's a logical and engaging game that always tells you that something must have left a mark or this number shouldn't be here! If you like challenging your brain, this game will really entertain you!
+
+## How do I make one for myself? 🧑‍💻🧑‍💻
 Use the `minesweeperlib` to create your own Minesweeper (as an exercise or to help students, etc.). It's provides just **5 functions** that allow you to create your Minesweeper in any platform (such as a browser):
 
 #### **1. The `GetBoard(cols, rows)` function**  
@@ -92,6 +98,10 @@ The last function determines the win/loss status. If you have flagged all the bo
 
 ---
 
-## Contribute
+## Why do I write its documentation in detail? 📝
+Because maybe someone will want to help make this repo's mission come true!
+
+## Contribute ☕
 - If you can provide fast and efficient ways to implement game logic, fork the repository and get started 👍
 - The game needs to have different themes. Design separate themes for the game 😊
+- If you can run the game on a platform that you don't think is common, I'd be happy to put the code you wrote for that platform in the cmd directory and submit a Pull Request so I can merge it 📝

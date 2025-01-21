@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
-	"github.com/eiannone/keyboard"
 	"slices"
 	"strings"
+
+	"github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
+	"github.com/eiannone/keyboard"
 )
 
 var theme Theme

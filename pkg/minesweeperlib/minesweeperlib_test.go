@@ -21,7 +21,8 @@ func TestGetBoard(t *testing.T) {
 }
 
 func TestGetRandomBombs(t *testing.T) {
-	bombs := *minesweeperlib.GetRandomBombs(3, 3, 1, 1, 8)
+	board := minesweeperlib.GetBoard(3, 3)
+	bombs := *minesweeperlib.GetRandomBombs(board, 1, 1, 8)
 	assert.False(t, slices.Contains(bombs, [2]int{1, 1}))
 }
 
@@ -44,7 +45,6 @@ func TestGetCellNumbers(t *testing.T) {
 }
 
 func TestGetOpeneds(t *testing.T) {
-	point := [2]int{2, 2}
-	o := minesweeperlib.GetOpeneds(minesweeperlib.GetBoard(3, 3), point)
-	assert.Contains(t, o, point)
+	o := minesweeperlib.GetOpeneds(minesweeperlib.GetBoard(3, 3), 2, 2)
+	assert.Contains(t, o, [2]int{2, 2})
 }

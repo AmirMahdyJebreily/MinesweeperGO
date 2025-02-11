@@ -34,7 +34,7 @@ func GetBoard(pos0 Point) *Boardframe {
 
 	return &board
 }
-func GetRandomBombs(board *Boardframe, point0 Point, count uint16) *Points {
+func GetRandomBombs(board *Boardframe, point0 Point, count int8) *Points {
 
 	bombs := make(Points, 0)
 	cols, rows := board.GetSize()
@@ -72,7 +72,7 @@ func GetRandomBombs(board *Boardframe, point0 Point, count uint16) *Points {
 	}
 
 	exclusionCenter = point0
-	var i uint16
+	var i int8
 	for i = 0; i < count; i++ {
 		x, y := findRandomPoint()
 		attachParticle(x, y)
@@ -144,14 +144,14 @@ func GetOpeneds(board *Boardframe, selected Point) Points {
 }
 
 // States 0: still playing, 1: Winner!, 2: Loser
-func GetState(board *Boardframe, bombsCount uint16, flaggeds map[[2]int]bool, point [2]int) int8 {
+func GetState(board *Boardframe, bombsCount int8, flaggeds map[Point]bool, point Point) int8 {
 	if flaggeds == nil {
 		if (*board)[point[1]][point[0]] == -1 {
 			return 2 // The Game is over !
 		}
 	}
 
-	if uint16(len(flaggeds)) == bombsCount {
+	if int8(len(flaggeds)) == bombsCount {
 		trueFlags := true
 		for flagged := range flaggeds {
 			if (*board)[flagged[1]][flagged[0]] != -1 {

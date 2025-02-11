@@ -34,7 +34,7 @@ func (t *Theme) DefaultSymbol(symbol string) string {
 	}
 }
 
-func (t *Theme) ColoriseNumber(n int) string {
+func (t *Theme) ColoriseNumber(n int8) string {
 	if n == 0 {
 		return t.DefaultSymbol(zero)
 	}

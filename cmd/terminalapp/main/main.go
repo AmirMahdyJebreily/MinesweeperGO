@@ -170,8 +170,8 @@ func main() {
 			}
 		}
 		if char == 'o' || char == 'O' || key == keyboard.KeyEnter {
+			x0, y0 = selected[0], selected[1]
 			if bombs == nil {
-				x0, y0 = selected[0], selected[1]
 				oppend = make([][2]int8, 0)
 				bombs = mnsw.GetRandomBombs(board, mnsw.AsPoint(x0, y0), bombsCount)
 				board = mnsw.GetCellNumbers(board, bombs)

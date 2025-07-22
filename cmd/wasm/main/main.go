@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	mnsw "github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
-	"go/types"
 	"slices"
 	"syscall/js"
+
+	mnsw "github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
 )
 
 //func JS_GetBoard() js.Func {
@@ -56,26 +56,36 @@ var bombs *mnsw.Points = nil
 var oppend mnsw.Points = nil
 
 func main() {
+	ch := make(chan interface{}, 0)
 	var ArgumentError = func(text string) js.ValueError {
 		return js.ValueError{
 			Method: fmt.Sprintf("Error: %v\nplease see documents again at (https://github.com/AmirMahdyJebreily/MinesweeperGO/tree/main/cmd/wasm/main)", text),
-			Type:   types.Int,
 		}
 	}
-	ch := make(chan interface{}, 0)
 	js.Global().Set("startGame", js.FuncOf(
 		func(this js.Value, args []js.Value) any {
-			if len(args) != 4 {
+			if len(args) < 5 {
 				jsErr := ArgumentError("Start arguments error")
 				return jsErr.Error()
 			}
 			cols, rows, bombsCount = int8(args[0].Int()), int8(args[1].Int()), int8(args[2].Int())
-			selcted = mnsw.AsPoint(int8(args[2].Int()), int8(args[3].Int()))
+			selcted = mnsw.AsPoint(int8(args[3].Int()), int8(args[4].Int()))
 			board = mnsw.GetBoard(mnsw.AsPoint(cols, rows))
 			bombs = mnsw.GetRandomBombs(board, selcted, bombsCount)
 			board = mnsw.GetCellNumbers(board, bombs)
 			oppend = slices.Concat(oppend, mnsw.GetOpeneds(board, selcted))
 			return 0
 		}))
+
+	js.Global().Set("getBoardArray", js.FuncOf(
+		func(this js.Value, args []js.Value) any {
+			return js.ValueOf(ConvertBoardToJsArray(board))
+		}))
+
+	js.Global().Set("getBoambsArray", js.FuncOf(
+		func(this js.Value, args []js.Value) any {
+			return js.ValueOf(ConvertBoardToJsArray(board))
+		}))
+
 	<-ch
 }

@@ -1,6 +1,7 @@
 package minesweeperlib
 
 import (
+	"iter"
 	"math"
 	"math/rand"
 	"slices"
@@ -21,6 +22,16 @@ func (b *Boardframe) GetSize() (cols, rows int8) {
 		return 0, 0
 	}
 	return int8(len((*b)[0])), int8(len(*b))
+}
+
+func (ps *Points) All() iter.Seq2[int, Point] {
+	return func(yeild func(int, Point) bool) {
+		for i, v := range *ps {
+			if !yeild(i, v) {
+				return
+			}
+		}
+	}
 }
 
 func GetBoard(pos0 Point) *Boardframe {

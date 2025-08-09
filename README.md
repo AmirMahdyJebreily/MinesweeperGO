@@ -3,7 +3,7 @@ A Go implementation of Minesweeper, currently available in terminal. In the futu
 
 ![Running in Windows](./docs/img/running-in-windows.jpg)
 ## How to play ? 🖥️
-The game is published for test on windows now. you can [download](https://github.com/AmirMahdyJebreily/MinesweeperGO/releases/tag/win-test) the .exe or you can build your exe :
+You can [download](https://github.com/AmirMahdyJebreily/MinesweeperGO/releases/tag/main) for #Linux, #Windows, #MacOs from here or:
 ```shell
 git clone https://github.com/AmirMahdyJebreily/MinesweeperGO.git && cd MinesweeperGO
 ```
@@ -106,4 +106,5 @@ Because maybe someone will want to help make this repo's mission come true!
 ## Contribute ☕
 - If you can provide fast and efficient ways to implement game logic, fork the repository and get started 👍
 - The game needs to have different themes. Design separate themes for the game 😊
+
 - If you can run the game on a platform that you don't think is common, I'd be happy to put the code you wrote for that platform in the cmd directory and submit a Pull Request so I can merge it 📝

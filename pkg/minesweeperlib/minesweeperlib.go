@@ -124,7 +124,7 @@ func GetCellNumbers(board *Boardframe, bombs *Points) *Boardframe {
 }
 
 func findZeroNeighbors(point0 Point, openeds *map[Point]struct{}, board *Boardframe) {
-	directions := [][2]int8{{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}}
+	directions := [8][2]int8{{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}}
 	x0, y0 := point0.GetComponents()
 	cols, rows := board.GetSize()
 	for _, direction := range directions {
@@ -161,16 +161,17 @@ func GetOpeneds(board *Boardframe, selected Point) Points {
 }
 
 // States 0: still playing, 1: Winner!, 2: Loser
-func GetState(board *Boardframe, bombsCount int8, flaggeds map[Point]bool, point Point) int8 {
+func GetState(board *Boardframe, bombsCount int8, flaggeds *Points, point Point) int8 {
 	if flaggeds == nil {
 		if (*board)[point[1]][point[0]] == -1 {
 			return 2 // The Game is over !
 		}
+		return 0
 	}
 
-	if int8(len(flaggeds)) == bombsCount {
+	if int8(len(*flaggeds)) == bombsCount {
 		trueFlags := true
-		for flagged := range flaggeds {
+		for _, flagged := range *flaggeds {
 			if (*board)[flagged[1]][flagged[0]] != -1 {
 				trueFlags = false
 				break

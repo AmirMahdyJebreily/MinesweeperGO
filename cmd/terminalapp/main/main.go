@@ -6,11 +6,10 @@ import (
 	"strings"
 
 	"github.com/AmirMahdyJebreily/MinesweeperGO/cmd/terminalapp/internal"
+	"github.com/AmirMahdyJebreily/MinesweeperGO/cmd/terminalapp/internal/theme-utils"
 	mnsw "github.com/AmirMahdyJebreily/MinesweeperGO/pkg/minesweeperlib"
 	"github.com/eiannone/keyboard"
 )
-
-var theme Theme
 
 func main() {
 
@@ -26,7 +25,6 @@ func main() {
 			break
 		}
 		theme.UsingEscapeCode = true
-		break
 	}
 
 	var cols, rows int8
@@ -41,33 +39,31 @@ func main() {
 		break
 	}
 	var bombsCount int8
-	for {
-		suggested := int8(int(float64(cols)*float64(rows)*0.21) - int(1))
-		fmt.Printf("\nEnter The count of bombs (default %v bombs): ", suggested)
-		_, scanError := fmt.Scanf("%v\n", &bombsCount)
-		if scanError != nil {
-			bombsCount = suggested
-			break
-		}
-		break
+
+	suggested := int8(int(float64(cols)*float64(rows)*0.21) - int(1))
+	fmt.Printf("\nEnter The count of bombs (default %v bombs): ", suggested)
+	_, scanError := fmt.Scanf("%v\n", &bombsCount)
+	if scanError != nil {
+		bombsCount = suggested
 	}
+
 	fmt.Println("\n\u001B[?1049h\u001B[H\u001B[J\u001B[?25l") // save screen
 	board := mnsw.GetBoard(mnsw.AsPoint(cols, rows))
-	flaggeds := make(map[mnsw.Point]bool, bombsCount)
+	flaggeds := make(mnsw.Points, 0, bombsCount)
 	selected := mnsw.AsPoint(cols/2, rows/2)
 	message := "[Arrows: Move] [O & Enter: Open Cell]\n[F & Space: Flag] [Q & ESC: Quit]\nSelect a cell to start game"
 	fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, nil, selected, message)).String())
 	var x0, y0 int8
 	var bombs *mnsw.Points = nil
 	var oppend mnsw.Points = nil
-	inGame := true
+	var state int8 = 0
 	if err := keyboard.Open(); err != nil {
 		panic(err)
 	}
-	defer func() {
-		_ = keyboard.Close()
-	}()
-	for inGame {
+
+	defer keyboard.Close()
+
+	for state == 0 {
 		char, key, err := keyboard.GetKey()
 		if err != nil {
 			panic(err)
@@ -93,31 +89,15 @@ func main() {
 			fmt.Print("\u001B[?1049l\u001B[?25h")
 			break
 		}
-
 		if char == 'f' || char == 'F' || key == keyboard.KeySpace {
-			if val, isflag := flaggeds[selected]; isflag || val {
-				delete(flaggeds, selected)
-				break
-			}
-
-			if int8(len(flaggeds)) < bombsCount {
-				flaggeds[selected] = true
-
-				state := mnsw.GetState(board, bombsCount, flaggeds, selected)
-				if state == 1 {
-					message = "You Win :)"
-					inGame = false
-					err := keyboard.Close()
-					if err != nil {
-						return
-					}
-					fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, nil, selected, message)).String())
-					fmt.Println("Press something to exit\n")
-					fmt.Scanln()
-					fmt.Print("\u001B[?1049l\u001B[?25h")
-					break
-				}
-				break
+			// toggle to remove the flag.
+			if slices.Contains(flaggeds, selected) {
+				i := slices.Index(flaggeds, selected)
+				flaggeds = append(flaggeds[:i], flaggeds[i+1:]...)
+				continue
+			} else if int8(len(flaggeds)) < bombsCount {
+				flaggeds = append(flaggeds, selected)
+				state = mnsw.GetState(board, bombsCount, &flaggeds, selected)
 			}
 		}
 		if char == 'o' || char == 'O' || key == keyboard.KeyEnter {
@@ -130,20 +110,29 @@ func main() {
 			}
 			oppend = slices.Concat(oppend, mnsw.GetOpeneds(board, mnsw.AsPoint(x0, y0)))
 
-			state := mnsw.GetState(board, bombsCount, nil, selected)
-			if state == 2 {
+			state = mnsw.GetState(board, bombsCount, nil, selected)
+		}
+
+		// Check for game finish
+
+		if state != 0 {
+			switch state {
+			case mnsw.WINNER_STATE:
+				message = "You Win :)"
+
+			case mnsw.LOSSER_STATE:
 				message = "Game Over :("
-				inGame = false
-				fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, nil, selected, message)).String())
-				fmt.Println("Press something to exit\n")
-				fmt.Scanln()
-				fmt.Print("\u001B[?1049l\u001B[?25h")
-				break
 			}
+			keyboard.Close()
 		}
 
 		// update screen
-		fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, &oppend, selected, message)).String())
-		fmt.Print()
+		if state != 0 {
+			fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, nil, selected, message)).String(), "\nPress something to exit")
+			fmt.Scanln()
+			fmt.Print("\u001B[?1049l\u001B[?25h")
+		} else {
+			fmt.Println((*internal.PrintBoard(board, bombsCount, &flaggeds, &oppend, selected, message)).String())
+		}
 	}
 }

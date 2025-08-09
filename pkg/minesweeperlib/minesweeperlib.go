@@ -11,6 +11,12 @@ type Point [2]int8
 type Points [][2]int8
 type Boardframe [][]int8
 
+const (
+	PLAY_STATE = iota
+	WINNER_STATE
+	LOSSER_STATE
+)
+
 func AsPoint(x, y int8) [2]int8 {
 	return [2]int8{x, y}
 }
